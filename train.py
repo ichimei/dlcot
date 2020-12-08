@@ -170,7 +170,7 @@ class Trainer(object):
             self.best_pred = new_pred
             self.saver.save_checkpoint({
                 'epoch': epoch + 1,
-                'state_dict': self.model.module.state_dict(),
+                'state_dict': self.model.state_dict(),
                 'optimizer': self.optimizer.state_dict(),
                 'best_pred': self.best_pred,
             }, is_best)
@@ -185,8 +185,8 @@ def main():
     parser.add_argument('--dataset', type=str, default='pascal',
                         choices=['pascal', 'coco', 'cityscapes'],
                         help='dataset name (default: pascal)')
-    parser.add_argument('--use-sbd', action='store_true', default=True,
-                        help='whether to use SBD dataset (default: True)')
+    parser.add_argument('--use-sbd', action='store_true', default=False,
+                        help='whether to use SBD dataset (default: False)')
     parser.add_argument('--workers', type=int, default=4,
                         metavar='N', help='dataloader threads')
     parser.add_argument('--base-size', type=int, default=513,
