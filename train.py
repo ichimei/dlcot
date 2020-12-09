@@ -173,7 +173,7 @@ class Trainer(object):
             is_best = True
             self.best_pred = new_pred
             self.saver.save_checkpoint({
-                'num_classes': self.args.num_classes,
+                'num_classes': self.nclass,
                 'backbone': self.args.backbone,
                 'output_stride': self.args.output_stride,
                 'sync_bn': self.args.sync_bn,
@@ -189,7 +189,7 @@ def main():
     parser.add_argument('--backbone', type=str, default='resnet',
                         choices=['resnet', 'xception', 'drn', 'mobilenet'],
                         help='backbone name (default: resnet)')
-    parser.add_argument('--out-stride', type=int, default=16,
+    parser.add_argument('--output-stride', type=int, default=16,
                         help='network output stride (default: 8)')
     parser.add_argument('--dataset', type=str, default='pascal',
                         choices=['pascal', 'coco', 'cityscapes'],
