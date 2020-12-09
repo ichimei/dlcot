@@ -10,7 +10,7 @@ torch.set_grad_enabled(False)
 CUDA = torch.cuda.is_available()
 
 from torchvision import transforms as tr
-from modeling.deeplab import DeepLab
+from dlcot.modeling.deeplab import DeepLab
 
 def transform(image):
     return tr.Compose([

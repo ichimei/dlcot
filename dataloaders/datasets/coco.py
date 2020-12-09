@@ -1,13 +1,13 @@
 import numpy as np
 import torch
 from torch.utils.data import Dataset
-from mypath import Path
 from tqdm import trange
 import os
 from pycocotools.coco import COCO
 from pycocotools import mask
 from torchvision import transforms
-from dataloaders import custom_transforms as tr
+from dlcot.mypath import Path
+from dlcot.dataloaders import custom_transforms as tr
 from PIL import Image, ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 

@@ -1,7 +1,7 @@
 import os
 from tqdm import tqdm
 import numpy as np
-from mypath import Path
+from dlcot.mypath import Path
 
 def calculate_weigths_labels(dataset, dataloader, num_classes):
     # Create an instance from the data loader

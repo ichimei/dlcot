@@ -5,10 +5,10 @@ import numpy as np
 import scipy.io
 import torch.utils.data as data
 from PIL import Image
-from mypath import Path
 
 from torchvision import transforms
-from dataloaders import custom_transforms as tr
+from dlcot.dataloaders import custom_transforms as tr
+from dlcot.mypath import Path
 
 class SBDSegmentation(data.Dataset):
     NUM_CLASSES = 21

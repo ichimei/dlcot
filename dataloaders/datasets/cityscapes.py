@@ -3,9 +3,9 @@ import numpy as np
 import scipy.misc as m
 from PIL import Image
 from torch.utils import data
-from mypath import Path
 from torchvision import transforms
-from dataloaders import custom_transforms as tr
+from dlcot.mypath import Path
+from dlcot.dataloaders import custom_transforms as tr
 
 class CityscapesSegmentation(data.Dataset):
     NUM_CLASSES = 19
