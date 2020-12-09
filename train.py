@@ -172,17 +172,22 @@ class Trainer(object):
         if new_pred > self.best_pred:
             is_best = True
             self.best_pred = new_pred
-            self.saver.save_checkpoint({
-                'num_classes': self.nclass,
-                'backbone': self.args.backbone,
-                'output_stride': self.args.output_stride,
-                'sync_bn': self.args.sync_bn,
-                'freeze_bn': self.args.freeze_bn,
-                'epoch': epoch + 1,
-                'state_dict': self.model.state_dict(),
-                'optimizer': self.optimizer.state_dict(),
-                'best_pred': self.best_pred,
-            }, is_best, filename='ckpt_epoch_{:04}.pth'.format(epoch + 1))
+        else:
+            is_best = False
+            if (epoch + 1) % 5:
+                return
+
+        self.saver.save_checkpoint({
+            'num_classes': self.nclass,
+            'backbone': self.args.backbone,
+            'output_stride': self.args.output_stride,
+            'sync_bn': self.args.sync_bn,
+            'freeze_bn': self.args.freeze_bn,
+            'epoch': epoch + 1,
+            'state_dict': self.model.state_dict(),
+            'optimizer': self.optimizer.state_dict(),
+            'best_pred': self.best_pred,
+        }, is_best, filename='ckpt_epoch_{:04}.pth'.format(epoch + 1))
 
 def main():
     parser = argparse.ArgumentParser(description="PyTorch DeeplabV3Plus Training")

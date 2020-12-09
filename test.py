@@ -27,7 +27,8 @@ def strip_state(state_dict):
     return res
 
 def load_model(model_file):
-    m = torch.load(model_file)
+    map_location = 'cpu' if not CUDA else None
+    m = torch.load(model_file, map_location=map_location)
     state_dict = m['state_dict']
     state_dict = strip_state(state_dict)
     model = DeepLab(num_classes=m['num_classes'],
