@@ -24,7 +24,7 @@ class Trainer(object):
         # Define Tensorboard Summary
         self.summary = TensorboardSummary(self.saver.experiment_dir)
         self.writer = self.summary.create_summary()
-        
+
         # Define Dataloader
         kwargs = {'num_workers': args.workers, 'pin_memory': True}
         self.train_loader, self.val_loader, self.test_loader, self.nclass = make_data_loader(args, **kwargs)
@@ -32,7 +32,7 @@ class Trainer(object):
         # Define network
         model = DeepLab(num_classes=self.nclass,
                         backbone=args.backbone,
-                        output_stride=args.out_stride,
+                        output_stride=args.output_stride,
                         sync_bn=args.sync_bn,
                         freeze_bn=args.freeze_bn)
 
@@ -56,7 +56,7 @@ class Trainer(object):
             weight = None
         self.criterion = SegmentationLosses(weight=weight, cuda=args.cuda).build_loss(mode=args.loss_type)
         self.model, self.optimizer = model, optimizer
-        
+
         # Define Evaluator
         self.evaluator = Evaluator(self.nclass)
         # Define lr scheduler
@@ -122,12 +122,16 @@ class Trainer(object):
             # save checkpoint every epoch
             is_best = False
             self.saver.save_checkpoint({
+                'num_classes': self.nclass,
+                'backbone': self.args.backbone,
+                'output_stride': self.args.output_stride,
+                'sync_bn': self.args.sync_bn,
+                'freeze_bn': self.args.freeze_bn,
                 'epoch': epoch + 1,
                 'state_dict': self.model.module.state_dict(),
                 'optimizer': self.optimizer.state_dict(),
                 'best_pred': self.best_pred,
-            }, is_best)
-
+            }, is_best, filename='ckpt_epoch_{:04}.pth'.format(epoch + 1))
 
     def validation(self, epoch):
         self.model.eval()
@@ -169,11 +173,16 @@ class Trainer(object):
             is_best = True
             self.best_pred = new_pred
             self.saver.save_checkpoint({
+                'num_classes': self.args.num_classes,
+                'backbone': self.args.backbone,
+                'output_stride': self.args.output_stride,
+                'sync_bn': self.args.sync_bn,
+                'freeze_bn': self.args.freeze_bn,
                 'epoch': epoch + 1,
                 'state_dict': self.model.state_dict(),
                 'optimizer': self.optimizer.state_dict(),
                 'best_pred': self.best_pred,
-            }, is_best)
+            }, is_best, filename='ckpt_epoch_{:04}.pth'.format(epoch + 1))
 
 def main():
     parser = argparse.ArgumentParser(description="PyTorch DeeplabV3Plus Training")
@@ -228,16 +237,16 @@ def main():
     # cuda, seed and logging
     parser.add_argument('--no-cuda', action='store_true', default=
                         False, help='disables CUDA training')
-    parser.add_argument('--gpu-ids', type=str, default='0',
+    parser.add_argument('--gpu-ids', type=str, default=None,
                         help='use which gpu to train, must be a \
-                        comma-separated list of integers only (default=0)')
+                        comma-separated list of integers only (default: all gpus)')
     parser.add_argument('--seed', type=int, default=1, metavar='S',
                         help='random seed (default: 1)')
     # checking point
     parser.add_argument('--resume', type=str, default=None,
                         help='put the path to resuming file if needed')
-    parser.add_argument('--checkname', type=str, default=None,
-                        help='set the checkpoint name')
+    parser.add_argument('--directory', type=str, default='run',
+                        help='set the model directory name')
     # finetuning pre-trained models
     parser.add_argument('--ft', action='store_true', default=False,
                         help='finetuning on a different dataset')
@@ -249,14 +258,20 @@ def main():
 
     args = parser.parse_args()
     args.cuda = not args.no_cuda and torch.cuda.is_available()
+    num_gpus = 0
     if args.cuda:
-        try:
-            args.gpu_ids = [int(s) for s in args.gpu_ids.split(',')]
-        except ValueError:
-            raise ValueError('Argument --gpu_ids must be a comma-separated list of integers only')
+        if args.gpu_ids is None:
+            num_gpus = torch.cuda.device_count()
+        else:
+            try:
+                args.gpu_ids = [int(s) for s in args.gpu_ids.split(',')]
+            except ValueError:
+                raise ValueError('Argument --gpu_ids must be a comma-separated list of integers only')
+            else:
+                num_gpus = len(args.gpu_ids)
 
     if args.sync_bn is None:
-        if args.cuda and len(args.gpu_ids) > 1:
+        if args.cuda and num_gpus > 1:
             args.sync_bn = True
         else:
             args.sync_bn = False
@@ -271,7 +286,7 @@ def main():
         args.epochs = epoches[args.dataset.lower()]
 
     if args.batch_size is None:
-        args.batch_size = 4 * len(args.gpu_ids)
+        args.batch_size = 4 * num_gpus
 
     if args.test_batch_size is None:
         args.test_batch_size = args.batch_size
@@ -282,11 +297,8 @@ def main():
             'cityscapes': 0.01,
             'pascal': 0.007,
         }
-        args.lr = lrs[args.dataset.lower()] / (4 * len(args.gpu_ids)) * args.batch_size
+        args.lr = lrs[args.dataset.lower()] / (4 * num_gpus) * args.batch_size
 
-
-    if args.checkname is None:
-        args.checkname = 'deeplab-'+str(args.backbone)
     print(args)
     torch.manual_seed(args.seed)
     trainer = Trainer(args)
