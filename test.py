@@ -48,7 +48,7 @@ def segment(np_image, model):
     if CUDA:
         image = image.cuda()
     output = model(image)
-    output = output.cpu().squeeze().numpy()
+    output = output.cpu().squeeze().detach().numpy()
     mask = np.argmax(output, axis=0)
     mask[mask > 0] = 255
     mask = mask.astype(np.uint8)
