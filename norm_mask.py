@@ -1,5 +1,6 @@
 import os
 import argparse
+import numpy as np
 import cv2
 
 MAP = {(255, 255, 255): 1}
@@ -37,11 +38,14 @@ def main():
     args = parse_args()
     masks_path = args.masks
     norm_masks_path = args.norm_masks
+    if not os.path.exists(norm_masks_path):
+        os.mkdir(norm_masks_path)
     masks = get_files(masks_path)
     for mask_file in masks:
-        mask = read_mask(os.path.join(masks_path, mask))
+        print(f'[INFO] Processing {mask_file}...')
+        mask = read_mask(os.path.join(masks_path, mask_file))
         normed = norm_mask(mask)
-        cv2.imwrite(os.path.join(norm_masks_path, mask), normed)
+        cv2.imwrite(os.path.join(norm_masks_path, mask_file), normed)
 
 if __name__ == '__main__':
     main()

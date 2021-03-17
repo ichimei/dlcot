@@ -6,7 +6,7 @@ Deep learning cotton boll segmentation project, based on the [PyTorch DeepLab v3
 
 # License
 
-The MIT License
+[The MIT License](LICENSE)
 
 # Introduction
 
