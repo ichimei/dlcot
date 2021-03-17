@@ -1,1 +1,4 @@
-CUDA_VISIBLE_DEVICES=2 python test.py --in-path COTSH_201030_0031.jpg --out-path COTSH_201030_0031.png --model my.pth
+SCRIPT=$(readlink -f "$0")
+SCRIPTPATH=$(dirname "$SCRIPT")
+PYTHONPATH=$(dirname "$SCRIPTPATH")
+python test.py --in-path input.jpg --out-path output.png --model my.pth --gpu 0

@@ -177,6 +177,8 @@ class Trainer(object):
             if (epoch + 1) % 5:
                 return
 
+        ib = '_best' if is_best else ''
+        fn = 'ckpt_epoch_{:04}{}.pth'.format(epoch + 1, ib)
         self.saver.save_checkpoint({
             'num_classes': self.nclass,
             'backbone': self.args.backbone,
@@ -187,7 +189,7 @@ class Trainer(object):
             'state_dict': self.model.state_dict(),
             'optimizer': self.optimizer.state_dict(),
             'best_pred': self.best_pred,
-        }, is_best, filename='ckpt_epoch_{:04}.pth'.format(epoch + 1))
+        }, is_best, filename=fn)
 
 def main():
     parser = argparse.ArgumentParser(description="PyTorch DeeplabV3Plus Training")
