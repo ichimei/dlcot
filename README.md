@@ -2,6 +2,8 @@
 
 Deep learning cotton boll segmentation project, based on the [PyTorch DeepLab v3+ implementation](https://github.com/jfzhang95/pytorch-deeplab-xception) by @jfzhang95.
 
+**Last Updated: Mar 17, 2021**
+
 # License
 
 The MIT License
@@ -29,9 +31,19 @@ Then create a directory somewhere (e.g. `cotsh/`), create four subdirectories, a
 - `cotsh/mask/`: Put all the normalized mask images (in `.png`) here.
 - `cotsh/sets/`: This includes two text files which tells the training and validation set.
 
-What is *normalized mask images*? The masks are basically in two colors, white and black.
+### For `cotsh/mask/`
 
-In `cotsh/sets/`, you should tell how the images should be splitted into training and validation set. We do not include the test set in the dataset, because it is not useful in training. In this directory, create two files:
+What is *normalized mask images*? The masks are in two colors, #FFFFFF and #000000. This is not clear enough - we want to tell the program that #FFFFFF is 1 and #000000 is 0. To do this, we convert the mask to another PNG where each pixel has only one channel (yes, a PNG file could do this), and the value should only be 0 and 1.
+
+You can use [`norm_mask.py`](norm_mask.py) in this repository to normalize the masks.
+```sh
+python norm_mask.py -m cotsh/mask_old/ -n cotsh/mask/
+```
+This automatically finds masks in `cotsh/mask_old/` and saves normalized ones in `cotsh/mask/`.
+
+### For `cotsh/sets/`
+
+In this directory, you should tell how the images should be splitted into training and validation set. We do not include the test set in the dataset, because it is not useful in training. In this directory, create two files:
 - `train.txt`: Tell the image names which should be treated as a training set.
 - `val.txt`: Tell the image names which should be treated as a validation set.
 
@@ -60,17 +72,13 @@ Edit `mypath.py`. We edit the files based on the `pascal` dataset, so please edi
 ```python
 ...
         if dataset == 'pascal':
-            return './cotsh/'  # Edit here!
+            return 'cotsh/'  # Edit here!
 ...
 ```
 Train the model using the dataset named `pascal`.
 ```sh
-python train.py --backbone resnet --lr 0.007 --workers 2 --epochs 50 --eval-interval 1 --dataset pascal --gpu-ids 0,1
+python train.py --backbone resnet --lr 0.007 --workers 2 --epochs 50 --eval-interval 1 --dataset pascal --directory run/ --gpu-ids 0,1
 ```
-**Important note:** you should set `PYTHONPATH` to the *parent* directory of this repository before running this. This is because the whole `dlcot` repository is as a submodule of a larger robot project, and we use `dlcot.xxx` in all the files when importing other files in the same repo. In fact, the original author does not do this, and we add the `dlcot.` in all the files manually. The original version does not require setting `PYTHONPATH`.
-
-We have already done this for you in `train.sh`. You may also set the `PYTHONPATH` in `~/.bashrc` if you like.
-
 To understand the options, see the help.
 ```sh
 python train.py -h
@@ -82,16 +90,21 @@ The checkpoint name looks like `ckpt_epoch_xxxx.pth`. The program saves a checkp
 
 If the program encounters a checkpoint which has the best mIoU in all the experiments, the filename and mIoU value will be included in `run/best_ever.txt`.
 
+**Important note:** you should set `PYTHONPATH` to the *parent* directory of this repository before running this. This is because the whole `dlcot` repository is as a submodule of a larger robot project, and we use `dlcot.xxx` in all the files when importing other files in the same repo. In fact, the original author does not do this, and we add the `dlcot.` in all the files manually. The original version does not require setting `PYTHONPATH`.
+
+We have already done this for you in `train.sh`. You may also set the `PYTHONPATH` in `~/.bashrc` if you like.
+
 ## Test the model
 
 After training, you can pick one of the `.pth` files for testing. For a model file (i.e. checkpoint file) `my.pth`, an input `input.jpg` results in an output `output.png`.
 ```sh
 python test.py --in-path input.jpg --out-path output.png --model my.pth --gpu 0
 ```
-Note that you may only use one GPU because we have tested that it would be slower in a multi-GPU design. To understand the options, see the help.
+To understand the options, see the help.
 ```sh
 python test.py -h
 ```
+Note that you may only use one GPU because we have tested that it would be slower in a multi-GPU design. In addition, also mind the `PYTHONPATH` here.
 
 ## Use `test.py` as a module
 

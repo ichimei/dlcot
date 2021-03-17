@@ -252,7 +252,7 @@ def main():
     # checking point
     parser.add_argument('--resume', type=str, default=None,
                         help='put the path to resuming file if needed')
-    parser.add_argument('--directory', type=str, default='run',
+    parser.add_argument('--directory', type=str, default='run/',
                         help='set the model directory name')
     # finetuning pre-trained models
     parser.add_argument('--ft', action='store_true', default=False,

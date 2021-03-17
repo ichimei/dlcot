@@ -38,7 +38,7 @@ class Saver(object):
             max_miou = max(previous_miou)
             if best_pred > max_miou:
                 with open(os.path.join(self.directory, 'best_ever.txt'), 'w') as f:
-                    f.write('Filename: ' + filename + '\n')
+                    f.write('filename: ' + filename + '\n')
                     f.write('mIoU: ' + str(best_pred) + '\n')
 
     def save_experiment_config(self):
