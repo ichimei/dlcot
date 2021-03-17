@@ -68,14 +68,14 @@ If the `-r` option is given, the select would be performed randomly. Otherwise, 
 
 ## Train the model
 
-Edit `mypath.py`. We edit the files based on the `pascal` dataset, so please edit line 5 to the path (e.g. `./cotsh/`) of the dataset we have just done.
+Edit [`mypath.py`](mypath.py). We edit the files based on the `pascal` dataset, so please edit line 5 to the path (e.g. `cotsh/`) of the dataset we have just done.
 ```python
 ...
         if dataset == 'pascal':
             return 'cotsh/'  # Edit here!
 ...
 ```
-Train the model using the dataset named `pascal`.
+Run [`train.py`](train.py) to train the model using the dataset named `pascal`.
 ```sh
 python train.py --backbone resnet --lr 0.007 --workers 2 --epochs 50 --eval-interval 1 --dataset pascal --directory run/ --gpu-ids 0,1
 ```
@@ -96,7 +96,7 @@ We have already done this for you in `train.sh`. You may also set the `PYTHONPAT
 
 ## Test the model
 
-After training, you can pick one of the `.pth` files for testing. For a model file (i.e. checkpoint file) `my.pth`, an input `input.jpg` results in an output `output.png`.
+After training, you can pick one `.pth` file for testing. Then run [`test.py`](test.py). For a model file (i.e. checkpoint file) `my.pth`, an input `input.jpg` results in an output `output.png`.
 ```sh
 python test.py --in-path input.jpg --out-path output.png --model my.pth --gpu 0
 ```
@@ -106,17 +106,17 @@ python test.py -h
 ```
 Note that you may only use one GPU because we have tested that it would be slower in a multi-GPU design. In addition, also mind the `PYTHONPATH` here.
 
-## Use `test.py` as a module
+## Use [`test.py`](test.py) as a module
 
 As mentioned, we use this in a cotton picking robot project. The `dlcot` repo is used [here](https://github.com/houjiawei11/cotton_seg_ros/tree/master/cotton_srv/scripts). You can see that it is actually used as a git submodule.
 
-To use `test.py` as a module, you should run your Python script under the *parent directory* of `dlcot`. Simply import `test.py`.
+To use [`test.py`](test.py) as a module, you should run your Python script under the *parent directory* of `dlcot`. Simply import it.
 ```python
 import dlcot.test as dltest
 ```
 Then load the model file in `.pth`. The model should be loaded only once.
 ```python
-model = dltest.load_model(YOUR_MODEL_PATH)
+model = dltest.load_model('my.pth')
 ```
 When you want to segment an image, input the `model` and a `numpy` RGB `image` (if you use `cv2`, note that you should convert the image to RGB instead of BGR):
 ```python
