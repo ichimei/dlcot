@@ -1,6 +1,6 @@
 # dlcot
 
-Deep learning cotton boll segmentation project, based on the PyTorch DeepLab v3+ [implementation](https://github.com/jfzhang95/pytorch-deeplab-xception) by @jfzhang95.
+Deep learning cotton boll segmentation project, based on the [PyTorch DeepLab v3+ implementation](https://github.com/jfzhang95/pytorch-deeplab-xception) by @jfzhang95.
 
 # License
 
@@ -78,9 +78,9 @@ python train.py -h
 
 For each experiment (i.e. each time you run), the program saves the checkpoints at `run/experiment_x/`. For the first time, it would be `run/experiment_0/`.
 
-The checkpoint name looks like `ckpt_epoch_xxxx.pth`. The program saves a checkpoint every 5 epoches. For a checkpoint which has the best validation result ever, the filename ends with `_best.pth`.
+The checkpoint name looks like `ckpt_epoch_xxxx.pth`. The program saves a checkpoint every 5 epoches. The result is evaluated on the validation set according to the mean intersection over union (aka. mIoU). For a checkpoint which has the best mIoU in the current experiment, the filename ends with `_best.pth`.
 
-If the program encounters a checkpoint which is the best one ever (i.e. in all experiments), that filename will be included in `run/best_ever.txt`.
+If the program encounters a checkpoint which has the best mIoU in all the experiments, the filename and mIoU value will be included in `run/best_ever.txt`.
 
 ## Test the model
 
@@ -93,7 +93,7 @@ Note that you may only use one GPU because we have tested that it would be slowe
 python test.py -h
 ```
 
-# Use `test.py` as a module
+## Use `test.py` as a module
 
 As mentioned, we use this in a cotton picking robot project. The `dlcot` repo is used [here](https://github.com/houjiawei11/cotton_seg_ros/tree/master/cotton_srv/scripts). You can see that it is actually used as a git submodule.
 
