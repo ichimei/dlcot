@@ -12,7 +12,20 @@ Deep learning cotton boll segmentation project, based on the [PyTorch DeepLab v3
 
 This is part of the cotton picking robot project. Given a 2D image from the camera, this module does image segmentation and returns a mask that tells which of the pixels are cotton (white, #FFFFFF) and which are the background (black, #000000).
 
-Our solution is to take photos in the cotton field, label manually, and train using a deep learning model called DeepLab v3+. We directly use the @jfzhang95 solution and write some more scripts to make it easy to use.
+Our solution is to take photos in the cotton field, label manually, and train using a deep learning model called DeepLab v3+. We directly use the PyTorch solution by @jfzhang95 and write some more scripts to make it easy to use.
+
+Please also read the [README](README_old.md) by the original author.
+
+# Installation
+
+The code has been tested with Anaconda and Python 3.8.
+
+Install [Anaconda](https://www.anaconda.com) and [PyTorch](https://pytorch.org).
+
+For other dependencies,
+```sh
+pip install matplotlib opencv-python pillow tensorboardX tqdm
+```
 
 # Usage
 
