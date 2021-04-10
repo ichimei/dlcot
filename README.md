@@ -2,7 +2,7 @@
 
 Deep learning cotton boll segmentation project, based on the [PyTorch DeepLab v3+ implementation](https://github.com/jfzhang95/pytorch-deeplab-xception) by @jfzhang95.
 
-**Last Updated: Mar 17, 2021**
+**Last Updated: Apr 10, 2021**
 
 # License
 
@@ -38,7 +38,52 @@ To use this module, you should
 
 To create a dataset, you should have already taken photos in the cotton field and labeled them manually, so you have the original images (in `.jpg`) and mask images (`.png`). The mask images should only have two colors: white (#FFFFFF, for cotton) and black (#000000, for background). The file names should match, for example, the original image `1.jpg` has the mask `1.png`.
 
-Then create a directory somewhere (e.g. `cotsh/`), create four subdirectories, and organize your files like this:
+### Label the images
+
+To label the images, we recommend two tools.
+
+#### Labelme
+
+[Labelme](https://github.com/wkentaro/labelme) is an open-source graphical image labeling tool. You can draw polygons on an image, and this tool saves the labels in a JSON file. The polygons are saved as lists of coordinates. Click on the link to see the installation and usage.
+
+We provide [`dump_labelme.py`](dump_labelme.py) which can convert (dump) such a JSON file to a mask. It depends on `labelme` (you might have installed) and `imagesize`.
+```sh
+pip install labelme imagesize
+```
+For an image `a.jpg` with its label `a.json`, run
+```sh
+python dump_labelme.py a.json
+```
+It will automatically search for `a.jpg` (required for getting image size) in the same directory and output the mask to `a.png`. The image name and the mask name are processed automatically and cannot be set manually. (You don't want to do that, right?)
+
+You can also pass multiple filenames. The program iterates over all the arguments and processes each file. You can run like this:
+```sh
+python dump_labelme.py a.json b.json c.json
+python dump_labelme.py *.json    # Using wildcard
+```
+
+#### Labelbox
+
+[Labelbox](https://labelbox.com) is an online graphical image labeling tool. You may upload the images, label online and export. Not only polygons, you may also let the system segment the image into superpixels and simply select superpixels to label.
+
+Labelbox exports the labels of a whole dataset to one JSON file. Unlike labelme, the JSON file contains URLs of mask images (in `.png`), and you do not need to convert from polygon coordinates, etc.
+
+However, if you label the image as more than one target (e.g. two cotton bolls are not labeled as the same target, but two separate targets in the system), each target will result in a separate image. We provide [`dump_labelbox.py`](dump_labelbox.py) which can automatically download mask images and merge the targets.
+
+For an exported JSON file `a.json`, run
+```sh
+python dump_labelbox.py output/
+```
+to save the `.png` mask images to `output/`. The image names are already contained in the JSON, so no need to specify.
+
+**Important note:** Sometimes the mask images given by Labelbox are turned 180 degrees. This might be caused by a bug when loading the image during labeling. To fix this, we provide [`turn_180.py`](turn_180.py). It takes one or more mask images (in fact it takes effect on any images) and turns each of them 180 degrees respectively.
+```sh
+python turn_180.py a.png b.png c.png
+```
+
+### Directory hierarchy
+
+After labeling, create a directory somewhere (e.g. `cotsh/`), create four subdirectories, and organize your files like this:
 - `cotsh/orig/`: Put all the original images (in `.jpg`) here.
 - `cotsh/mask_old/`: Put all the mask images (in `.png`) here.
 - `cotsh/mask/`: Put all the normalized mask images (in `.png`) here.

@@ -57,7 +57,7 @@ def segment(np_image, model):
     return mask
 
 def main():
-    parser = argparse.ArgumentParser(description="PyTorch DeeplabV3Plus Training")
+    parser = argparse.ArgumentParser(description="PyTorch DeeplabV3Plus Testing")
     parser.add_argument('-i', '--in-path', type=str, required=True, help='image to test')
     parser.add_argument('-o', '--out-path', type=str, required=True, help='mask image to save')
     parser.add_argument('-m', '--model', type=str, required=True,
